@@ -115,3 +115,19 @@ switch (state) {
         flushTag();
         break;
 }
+
+// 期待する出力
+// ==========
+//
+// flushBody:(これはテストだぜ)
+// flushTag:(<br>)
+// flushBody:(ストリームの練習だぜ)
+// flushTag:(<br>)
+// flushBody:(わはは草)
+// flushTag:(<br>)
+// flushBody:(ひょひょひょ)
+// flushTag:(<br>)
+// flushBody:(ぷーん)
+// flushTag:(<br>)
+// flushBody:(ぷーん)
+// flushTag:(<br>)
