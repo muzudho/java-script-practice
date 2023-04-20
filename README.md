@@ -12,6 +12,10 @@
 
 ## References
 
+HTMLの仕様の例  
+
+* 📖 [Living Standard — Last Updated 17 April 2023](https://html.spec.whatwg.org/)
+
 テキストのストリーミングを使っているプログラムの例  
 
 * 📖 [kotonoha_tkoolMZ_Plugins](https://github.com/kotonoha0109/kotonoha_tkoolMZ_Plugins/blob/main/plugins/ChatGPT_APIMZ.js)
