@@ -5,16 +5,147 @@
 //
 // - HTMLタグ入りの文字列が、ストリームで数文字ずつ分割して送られてくる
 // - 送られてきた順に、本文およびタグを読取る
+//
+//
+// Examples
+// ========
+//
+// 入力（以下のような、細切れの文字列）
+// ------------------------------
+//
+// <,font color="yell,ow" ,size=",18,">ローナ,</,fo,n,t>：<br>
+// あ,りがとうござ,いま,す！ぜひ食べて,み,てく,ださ,い。<br,>
+// ご注文いただ,けますか？
+//
+// <font color=,"yellow" size="24">エ,レノ,ア,<,/font>：,<br>
+// こんにちわ,、旅人,さん,！,あた,し,は<stro,ng>,エレノア<,/st,rong>,って言うんだ,よ。,
+// ここ,は<,str,ong,>,カ,ーレル,村</st,r,o,ng,>だ,よ。
+// ,
+//
+//
+// コンソール出力の一例（タグを固まりとして取得できる）
+// --------------------------------------------
+//
+// Body(
+// )
+// previousAttributeName:(color) nameStart:(9) previousAttributeValue:("yellow")
+// Tag(<font color="yellow" size="18">) Name(font) Attributes( (color=yellow)  (size=18) )
+// Body(ロ)
+// Body(ー)
+// Body(ナ)
+// CloseTag(</font>) Name(font)
+// Body(：)
+// Tag(<br>) Name(br) Attributes()
+// Body(
+// )
+// Body(あ)
+// Body(り)
+// Body(が)
+// Body(と)
+// Body(う)
+// Body(ご)
+// Body(ざ)
+// Body(い)
+// Body(ま)
+// Body(す)
+// Body(！)
+// Body(ぜ)
+// Body(ひ)
+// Body(食)
+// Body(べ)
+// Body(て)
+// Body(み)
+// Body(て)
+// Body(く)
+// Body(だ)
+// Body(さ)
+// Body(い)
+// Body(。)
+// Tag(<br>) Name(br) Attributes()
+// Body(
+// )
+// Body(ご)
+// Body(注)
+// Body(文)
+// Body(い)
+// Body(た)
+// Body(だ)
+// Body(け)
+// Body(ま)
+// Body(す)
+// Body(か)
+// Body(？)
+// Body(
+// )
+// Body(
+// )
+// previousAttributeName:(color) nameStart:(9) previousAttributeValue:("yellow")
+// Tag(<font color="yellow" size="24">) Name(font) Attributes( (color=yellow)  (size=24) )
+// Body(エ)
+// Body(レ)
+// Body(ノ)
+// Body(ア)
+// CloseTag(</font>) Name(font)
+// Body(：)
+// Tag(<br>) Name(br) Attributes()
+// Body(
+// )
+// Body(こ)
+// Body(ん)
+// Body(に)
+// Body(ち)
+// Body(わ)
+// Body(、)
+// Body(旅)
+// Body(人)
+// Body(さ)
+// Body(ん)
+// Body(！)
+// Body(あ)
+// Body(た)
+// Body(し)
+// Body(は)
+// Tag(<strong>) Name(strong) Attributes()
+// Body(エ)
+// Body(レ)
+// Body(ノ)
+// Body(ア)
+// CloseTag(</strong>) Name(strong)
+// Body(っ)
+// Body(て)
+// Body(言)
+// Body(う)
+// Body(ん)
+// Body(だ)
+// Body(よ)
+// Body(。)
+// Body(
+// )
+// Body(こ)
+// Body(こ)
+// Body(は)
+// Tag(<strong>) Name(strong) Attributes()
+// Body(カ)
+// Body(ー)
+// Body(レ)
+// Body(ル)
+// Body(村)
+// CloseTag(</strong>) Name(strong)
+// Body(だ)
+// Body(よ)
+// Body(。)
+// Body(
+// )
 
 function main() {
     // テスト・データ
     // ============
     const testData = `
-<font color="yellow">ローナ</font>：<br>
+<font color="yellow" size="18">ローナ</font>：<br>
 ありがとうございます！ぜひ食べてみてください。<br>
 ご注文いただけますか？
 
-<font color="yellow">エレノア</font>：<br>
+<font color="yellow" size="24">エレノア</font>：<br>
 こんにちわ、旅人さん！あたしは<strong>エレノア</strong>って言うんだよ。
 ここは<strong>カーレル村</strong>だよ。
 `;
@@ -46,26 +177,54 @@ ${testDataFragments}
     //
     const streamHtmlParser = new StreamHTMLParser(
         //
-        // 本文から１文字読み取った時
-        // ======================
+        // 本文から１文字読み取った時の処理をここに書く
+        // ======================================
+        //
+        // * `fragment` - 読取った文字
         //
         (fragment) => {
-            // 出力
+            //
+            // 出力例： Body(あ)
+            //
             console.log(`Body(${fragment})`);
         },
         //
-        // タグを読み取った時
-        // ===============
+        // タグを読み取った時の処理をここに書く
+        // ===============================
+        //
+        // * `sourceText` - 解析前のテキスト
+        // * `isClose` - 閉じタグか？
+        // * `tagName` - タグ名
+        // * `attributes` - 属性の連想配列
         //
         (sourceText, isClose, tagName, attributes) => {
             // 出力
             if (isClose) {
-                // 閉じタグ
-                const attributesStr = JSON.stringify(attributes, null, "    ");
-                console.log(`CloseTag(${sourceText}) Name(${tagName}) Attributes(${attributesStr})`);
+                //
+                // 閉じタグを読取った時の処理をここに書く
+                // =================================
+                //
+                // 出力例： CloseTag(</Font>) Name(Font)
+                //
+                console.log(`CloseTag(${sourceText}) Name(${tagName})`);
             } else {
-                // 開きタグ、または単独で使うタグ
-                const attributesStr = JSON.stringify(attributes, null, "    ");
+                // 開きタグ、または単独で使うタグを読取った時の処理をここに書く
+                // ===================================================
+
+                // 属性の読取り方の例
+                // ================
+                //
+                // 出力例： Tag(<font color="yellow" size="24">) Name(font) Attributes( (color=yellow)  (size=24) )
+                //
+                const buffer = [];
+                for (const key in attributes) {
+                    buffer.push(" (");
+                    buffer.push(key);
+                    buffer.push("=");
+                    buffer.push(attributes[key]);
+                    buffer.push(") ");
+                }
+                const attributesStr = buffer.join("");
                 console.log(`Tag(${sourceText}) Name(${tagName}) Attributes(${attributesStr})`);
             }
         }
@@ -85,6 +244,8 @@ ${testDataFragments}
 
 /**
  * ストリーム HTML パーサー
+ *
+ * - 別ファイルにしてインポートした方が便利
  */
 class StreamHTMLParser {
     /**
@@ -107,8 +268,9 @@ class StreamHTMLParser {
     }
 
     /**
+     * ストリームから読取った文字列を渡してください
      *
-     * @param {*} fragment 細切れの　フラグメント（Fragment；断片）
+     * @param {*} fragment - 細切れの　フラグメント（Fragment；断片）
      */
     append(fragment) {
         // キャラクターズ（Characters；複数の文字）
@@ -253,46 +415,3 @@ class StreamHTMLParser {
 
 // 実行
 main();
-// 期待する出力
-// ==========
-//
-// writeBody:(こ)
-// writeBody:(れ)
-// writeBody:(は)
-// writeBody:(テ)
-// writeBody:(ス)
-// writeBody:(ト)
-// writeBody:(だ)
-// writeBody:(ぜ)
-// flushTag:(<br>)
-// writeBody:(ス)
-// writeBody:(ト)
-// writeBody:(リ)
-// writeBody:(ー)
-// writeBody:(ム)
-// writeBody:(の)
-// writeBody:(練)
-// writeBody:(習)
-// writeBody:(だ)
-// writeBody:(ぜ)
-// flushTag:(<br>)
-// writeBody:(わ)
-// writeBody:(は)
-// writeBody:(は)
-// writeBody:(草)
-// flushTag:(<br>)
-// writeBody:(ひ)
-// writeBody:(ょ)
-// writeBody:(ひ)
-// writeBody:(ょ)
-// writeBody:(ひ)
-// writeBody:(ょ)
-// flushTag:(<br>)
-// writeBody:(ぷ)
-// writeBody:(ー)
-// writeBody:(ん)
-// flushTag:(<br>)
-// writeBody:(ぷ)
-// writeBody:(ー)
-// writeBody:(ん)
-// flushTag:(<br>)
