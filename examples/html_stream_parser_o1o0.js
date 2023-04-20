@@ -186,17 +186,29 @@ class StreamHTMLParser {
             for (const char of restList) {
                 if (char == "=") {
                     // 「=」の前にある単語は「属性名」、それより前に入っているものは「属性値」
-                    const text = buffer.join("").trim();
+                    const text = buffer.join("");
 
                     let nameStart = text.lastIndexOf(" ");
                     if (nameStart < 0) {
                         nameStart = 0;
+                    } else {
+                        // 区切りの半角空白を読み飛ばす
+                        nameStart++;
                     }
 
-                    const previousAttributeValue = text.slice(0, nameStart);
+                    // 値が確定すると、１つ前の属性の名前とペアになる
+                    if (previousAttributeName !== "") {
+                        let previousAttributeValue = text.slice(0, nameStart).trim();
+                        console.log(`previousAttributeName:(${previousAttributeName}) nameStart:(${nameStart}) previousAttributeValue:(${previousAttributeValue})`);
 
-                    // １つ前の属性が確定する
-                    attributes[previousAttributeName] = previousAttributeValue;
+                        // 値の両端にダブルクォーテーションがあれば外す
+                        if (previousAttributeValue[0] === '"' && previousAttributeValue[previousAttributeValue.length - 1] === '"') {
+                            previousAttributeValue = previousAttributeValue.slice(1, -1);
+                        }
+
+                        // １つ前の属性が確定する
+                        attributes[previousAttributeName] = previousAttributeValue;
+                    }
 
                     // 次の属性の名前が確定する
                     previousAttributeName = text.slice(nameStart);
@@ -210,7 +222,13 @@ class StreamHTMLParser {
 
             // 最後の属性の値
             if (0 < buffer.length) {
-                attributes[previousAttributeName] = buffer.join("");
+                let lastAttributeValue = buffer.join("");
+                // 値の両端にダブルクォーテーションがあれば外す
+                if (lastAttributeValue[0] === '"' && lastAttributeValue[lastAttributeValue.length - 1] === '"') {
+                    lastAttributeValue = lastAttributeValue.slice(1, -1);
+                }
+
+                attributes[previousAttributeName] = lastAttributeValue;
             }
 
             // 結果
