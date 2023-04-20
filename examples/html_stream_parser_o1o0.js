@@ -50,16 +50,22 @@ ${testDataFragments}
         // ======================
         //
         (fragment) => {
-            // すぐ出力
-            console.log(`C(${fragment})`);
+            // 出力
+            console.log(`Body(${fragment})`);
         },
         //
         // タグを読み取った時
         // ===============
         //
-        (tag) => {
-            // すぐ出力
-            console.log(`T(${tag})`);
+        (sourceText, isClose) => {
+            // 出力
+            if (isClose) {
+                // 閉じタグ
+                console.log(`CloseTag(${sourceText})`);
+            } else {
+                // 開きタグ、または単独で使うタグ
+                console.log(`Tag(${sourceText})`);
+            }
         }
     );
 
@@ -144,8 +150,32 @@ class StreamHTMLParser {
      */
     flushTag() {
         if (1 <= this.tagBuffer.length) {
-            const text = this.tagBuffer.join("");
-            this.onTagRead(text);
+            const sourceText = this.tagBuffer.join("");
+            const buffer = [];
+
+            // タグ名読取
+            // =========
+
+            // １文字目は "<"
+            // ２文字目が "/" なら閉じタグ
+            var isClose = this.tagBuffer[1] === "/";
+            if (isClose) {
+                // 先頭の "</" を削る
+                this.tagBuffer = this.tagBuffer.slice(2);
+            } else {
+                // 先頭の "<" を削る
+                this.tagBuffer = this.tagBuffer.slice(1);
+            }
+
+            for (const char of this.tagBuffer) {
+                if (char == " " || char == ">") {
+                    break;
+                } else {
+                    buffer.push(char);
+                }
+            }
+
+            this.onTagRead(sourceText, isClose);
         }
         this.tagBuffer = [];
     }
