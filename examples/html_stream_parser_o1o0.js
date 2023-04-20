@@ -153,7 +153,6 @@ class StreamHTMLParser {
     flushTag() {
         if (1 <= this.tagBuffer.length) {
             const sourceText = this.tagBuffer.join("");
-            const buffer = [];
 
             // タグ名読取
             // =========
@@ -177,40 +176,45 @@ class StreamHTMLParser {
             const tagName = this.tagBuffer.slice(0, endOfName).join("");
             const restList = this.tagBuffer.slice(endOfName);
 
-            function parseRestList(restList, attributes, previousAttributeName) {
-                const buffer = [];
+            // 属性読取
+            // =======
+            //
+            const attributes = {};
+            let buffer = [];
+            let previousAttributeName = "";
 
-                for (const char of restList) {
-                    if (char == "=") {
-                        // 「=」の前にある単語は「属性名」、それより前に入っているものは「属性値」
-                        const text = buffer.join("").trim();
+            for (const char of restList) {
+                if (char == "=") {
+                    // 「=」の前にある単語は「属性名」、それより前に入っているものは「属性値」
+                    const text = buffer.join("").trim();
 
-                        let nameStart = text.lastIndexOf(" ");
-                        if (nameStart < 0) {
-                            nameStart = 0;
-                        }
-
-                        const previousAttributeValue = text.slice(0, nameStart);
-
-                        // １つ前の属性が確定する
-                        attributes[previousAttributeName] = previousAttributeValue;
-
-                        // 次の属性の名前が確定する
-                        previousAttributeName = text.slice(nameStart);
-                    } else {
-                        buffer.push(char);
+                    let nameStart = text.lastIndexOf(" ");
+                    if (nameStart < 0) {
+                        nameStart = 0;
                     }
-                }
 
-                // 最後の属性の値
-                if (0 < buffer.length) {
-                    attributes[previousAttributeName] = buffer.join("");
+                    const previousAttributeValue = text.slice(0, nameStart);
+
+                    // １つ前の属性が確定する
+                    attributes[previousAttributeName] = previousAttributeValue;
+
+                    // 次の属性の名前が確定する
+                    previousAttributeName = text.slice(nameStart);
+
+                    // フラッシュ
+                    buffer = [];
+                } else {
+                    buffer.push(char);
                 }
             }
 
-            const attributes = {};
-            parseRestList(restList, attributes, "");
+            // 最後の属性の値
+            if (0 < buffer.length) {
+                attributes[previousAttributeName] = buffer.join("");
+            }
 
+            // 結果
+            // ====
             this.onTagRead(sourceText, isClose, tagName, attributes);
         }
         this.tagBuffer = [];
