@@ -57,14 +57,16 @@ ${testDataFragments}
         // タグを読み取った時
         // ===============
         //
-        (sourceText, isClose, tagName, restText) => {
+        (sourceText, isClose, tagName, attributes) => {
             // 出力
             if (isClose) {
                 // 閉じタグ
-                console.log(`CloseTag(${sourceText}) Name(${tagName}) Rest(${restText})`);
+                const attributesStr = JSON.stringify(attributes, null, "    ");
+                console.log(`CloseTag(${sourceText}) Name(${tagName}) Attributes(${attributesStr})`);
             } else {
                 // 開きタグ、または単独で使うタグ
-                console.log(`Tag(${sourceText}) Name(${tagName}) Rest(${restText})`);
+                const attributesStr = JSON.stringify(attributes, null, "    ");
+                console.log(`Tag(${sourceText}) Name(${tagName}) Attributes(${attributesStr})`);
             }
         }
     );
@@ -173,18 +175,43 @@ class StreamHTMLParser {
                 endOfName = this.tagBuffer.length;
             }
             const tagName = this.tagBuffer.slice(0, endOfName).join("");
+            const restList = this.tagBuffer.slice(endOfName);
 
-            const restText = this.tagBuffer.slice(endOfName).join("");
+            function parseRestList(restList, attributes, previousAttributeName) {
+                const buffer = [];
 
-            for (const char of this.tagBuffer) {
-                if (char == " " || char == ">") {
-                    break;
-                } else {
-                    buffer.push(char);
+                for (const char of restList) {
+                    if (char == "=") {
+                        // 「=」の前にある単語は「属性名」、それより前に入っているものは「属性値」
+                        const text = buffer.join("").trim();
+
+                        let nameStart = text.lastIndexOf(" ");
+                        if (nameStart < 0) {
+                            nameStart = 0;
+                        }
+
+                        const previousAttributeValue = text.slice(0, nameStart);
+
+                        // １つ前の属性が確定する
+                        attributes[previousAttributeName] = previousAttributeValue;
+
+                        // 次の属性の名前が確定する
+                        previousAttributeName = text.slice(nameStart);
+                    } else {
+                        buffer.push(char);
+                    }
+                }
+
+                // 最後の属性の値
+                if (0 < buffer.length) {
+                    attributes[previousAttributeName] = buffer.join("");
                 }
             }
 
-            this.onTagRead(sourceText, isClose, tagName, restText);
+            const attributes = {};
+            parseRestList(restList, attributes, "");
+
+            this.onTagRead(sourceText, isClose, tagName, attributes);
         }
         this.tagBuffer = [];
     }
