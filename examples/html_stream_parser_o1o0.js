@@ -57,14 +57,14 @@ ${testDataFragments}
         // タグを読み取った時
         // ===============
         //
-        (sourceText, isClose) => {
+        (sourceText, isClose, tagName, restText) => {
             // 出力
             if (isClose) {
                 // 閉じタグ
-                console.log(`CloseTag(${sourceText})`);
+                console.log(`CloseTag(${sourceText}) Name(${tagName}) Rest(${restText})`);
             } else {
                 // 開きタグ、または単独で使うタグ
-                console.log(`Tag(${sourceText})`);
+                console.log(`Tag(${sourceText}) Name(${tagName}) Rest(${restText})`);
             }
         }
     );
@@ -160,12 +160,21 @@ class StreamHTMLParser {
             // ２文字目が "/" なら閉じタグ
             var isClose = this.tagBuffer[1] === "/";
             if (isClose) {
-                // 先頭の "</" を削る
-                this.tagBuffer = this.tagBuffer.slice(2);
+                // 先頭の "</" と、末尾の ">" を削る
+                this.tagBuffer = this.tagBuffer.slice(2, -1);
             } else {
-                // 先頭の "<" を削る
-                this.tagBuffer = this.tagBuffer.slice(1);
+                // 先頭の "<" と、末尾の ">" を削る
+                this.tagBuffer = this.tagBuffer.slice(1, -1);
             }
+
+            // 次のスペースまで（無ければ全て）が、タグ名
+            let endOfName = this.tagBuffer.indexOf(" ");
+            if (endOfName < 0) {
+                endOfName = this.tagBuffer.length;
+            }
+            const tagName = this.tagBuffer.slice(0, endOfName).join("");
+
+            const restText = this.tagBuffer.slice(endOfName).join("");
 
             for (const char of this.tagBuffer) {
                 if (char == " " || char == ">") {
@@ -175,7 +184,7 @@ class StreamHTMLParser {
                 }
             }
 
-            this.onTagRead(sourceText, isClose);
+            this.onTagRead(sourceText, isClose, tagName, restText);
         }
         this.tagBuffer = [];
     }
