@@ -1,132 +1,133 @@
-// HTML ストリーム・パーサー エグザンプル
-// ==================================
-//
-//
-// 試行方法
-// =======
-//
-// 👇 このファイルを、 Paiza の Webサイトで Java Script を貼り付けると、試行できる
-//
-// * 📖 [paiza.io](https://paiza.io/ja/projects/new?language=javascript)
-//
-//
-// シナリオ
-// =======
-//
-// - HTMLタグ入りの文字列が、ストリームで数文字ずつ分割して送られてくる
-// - 送られてきた順に、本文およびタグを読取る
-//
-//
-// 入力データ例
-// ============
-//
-// - 以下のように、入力文字列をランダムな長さに細切れにしてから入力される
-//
-// <,fo,nt c,olor="yellow" ,si,ze="1,8">上長</,font>：,<br,>
-// ちょっと,　これだけ入れ,てく,ださい　,これ,だけ,。<br,>,
-// 簡,単,だから
-//
-// <font co,l,or,=",b,lue" siz,e="24">デベロ,ッパー</,font>,：<br,>
-// ,<,s,tr,ong>納期</,s,tron,g>は伸び,るんですか？,
-//
-// <,f,ont colo,r="yello,w" size="1,8">,上長</font>,：,<br>
-// 伸び,ない
-//
-//
-//
-// 読取例
-// ======
-//
-// - 以下のように、タグを固まりとして取得できる
-//
-// Body     |
-//
-// Tag      | font {color=yellow, size=18} | <font color="yellow" size="18">
-// Body     | 上
-// Body     | 長
-// CloseTag | font | </font>
-// Body     | ：
-// Tag      | br | <br>
-// Body     |
-//
-// Body     | ち
-// Body     | ょ
-// Body     | っ
-// Body     | と
-// Body     |
-// Body     | こ
-// Body     | れ
-// Body     | だ
-// Body     | け
-// Body     | 入
-// Body     | れ
-// Body     | て
-// Body     | く
-// Body     | だ
-// Body     | さ
-// Body     | い
-// Body     |
-// Body     | こ
-// Body     | れ
-// Body     | だ
-// Body     | け
-// Body     | 。
-// Tag      | br | <br>
-// Body     |
-//
-// Body     | 簡
-// Body     | 単
-// Body     | だ
-// Body     | か
-// Body     | ら
-// Body     |
-//
-// Body     |
-//
-// Tag      | font {color=blue, size=24} | <font color="blue" size="24">
-// Body     | デ
-// Body     | ベ
-// Body     | ロ
-// Body     | ッ
-// Body     | パ
-// Body     | ー
-// CloseTag | font | </font>
-// Body     | ：
-// Tag      | br | <br>
-// Body     |
-//
-// Tag      | strong | <strong>
-// Body     | 納
-// Body     | 期
-// CloseTag | strong | </strong>
-// Body     | は
-// Body     | 伸
-// Body     | び
-// Body     | る
-// Body     | ん
-// Body     | で
-// Body     | す
-// Body     | か
-// Body     | ？
-// Body     |
-//
-// Body     |
-//
-// Tag      | font {color=yellow, size=18} | <font color="yellow" size="18">
-// Body     | 上
-// Body     | 長
-// CloseTag | font | </font>
-// Body     | ：
-// Tag      | br | <br>
-// Body     |
-//
-// Body     | 伸
-// Body     | び
-// Body     | な
-// Body     | い
-// Body     |
-
-function main() {
+/**
+ * HTML ストリーム・パーサー エグザンプル
+ * ==================================
+ *
+ *
+ * 試行方法
+ * =======
+ *
+ * 👇 このファイルを、 Paiza の Webサイトで Java Script を貼り付けると、試行できる
+ *
+ * * 📖 [paiza.io](https: *paiza.io/ja/projects/new?language=javascript)
+ *
+ *
+ * シナリオ
+ * =======
+ *
+ * - HTMLタグ入りの文字列が、ストリームで数文字ずつ分割して送られてくる
+ * - 送られてきた順に、本文およびタグを読取る
+ *
+ *
+ * 入力データ例
+ * ============
+ *
+ * - 以下のように、入力文字列をランダムな長さに細切れにしてから入力される
+ *
+ * <,fo,nt c,olor="yellow" ,si,ze="1,8">上長</,font>：,<br,>
+ * ちょっと,　これだけ入れ,てく,ださい　,これ,だけ,。<br,>,
+ * 簡,単,だから
+ *
+ * <font co,l,or,=",b,lue" siz,e="24">デベロ,ッパー</,font>,：<br,>
+ * ,<,s,tr,ong>納期</,s,tron,g>は伸び,るんですか？,
+ *
+ * <,f,ont colo,r="yello,w" size="1,8">,上長</font>,：,<br>
+ * 伸び,ない
+ *
+ *
+ *
+ * 読取例
+ * ======
+ *
+ * - 以下のように、タグを固まりとして取得できる
+ *
+ * Body     |
+ *
+ * Tag      | font {color=yellow, size=18} | <font color="yellow" size="18">
+ * Body     | 上
+ * Body     | 長
+ * CloseTag | font | </font>
+ * Body     | ：
+ * Tag      | br | <br>
+ * Body     |
+ *
+ * Body     | ち
+ * Body     | ょ
+ * Body     | っ
+ * Body     | と
+ * Body     |
+ * Body     | こ
+ * Body     | れ
+ * Body     | だ
+ * Body     | け
+ * Body     | 入
+ * Body     | れ
+ * Body     | て
+ * Body     | く
+ * Body     | だ
+ * Body     | さ
+ * Body     | い
+ * Body     |
+ * Body     | こ
+ * Body     | れ
+ * Body     | だ
+ * Body     | け
+ * Body     | 。
+ * Tag      | br | <br>
+ * Body     |
+ *
+ * Body     | 簡
+ * Body     | 単
+ * Body     | だ
+ * Body     | か
+ * Body     | ら
+ * Body     |
+ *
+ * Body     |
+ *
+ * Tag      | font {color=blue, size=24} | <font color="blue" size="24">
+ * Body     | デ
+ * Body     | ベ
+ * Body     | ロ
+ * Body     | ッ
+ * Body     | パ
+ * Body     | ー
+ * CloseTag | font | </font>
+ * Body     | ：
+ * Tag      | br | <br>
+ * Body     |
+ *
+ * Tag      | strong | <strong>
+ * Body     | 納
+ * Body     | 期
+ * CloseTag | strong | </strong>
+ * Body     | は
+ * Body     | 伸
+ * Body     | び
+ * Body     | る
+ * Body     | ん
+ * Body     | で
+ * Body     | す
+ * Body     | か
+ * Body     | ？
+ * Body     |
+ *
+ * Body     |
+ *
+ * Tag      | font {color=yellow, size=18} | <font color="yellow" size="18">
+ * Body     | 上
+ * Body     | 長
+ * CloseTag | font | </font>
+ * Body     | ：
+ * Tag      | br | <br>
+ * Body     |
+ *
+ * Body     | 伸
+ * Body     | び
+ * Body     | な
+ * Body     | い
+ * Body     |
+ */
+function runExample() {
     // テスト・データ
     // ============
     const testData = `
@@ -408,5 +409,5 @@ class StreamHTMLParser {
     }
 }
 
-// 実行
-main();
+// エグザンプル実行
+runExample();
