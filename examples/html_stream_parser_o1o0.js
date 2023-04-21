@@ -1,17 +1,26 @@
-// HTML ストリーム・パーサー
-// ======================
+// HTML ストリーム・パーサー エグザンプル
+// ==================================
+//
+//
+// 実行方法
+// =======
+//
+// 👇 Paiza の Webサイトで Java Script を貼り付けると、試行できる
+//
+// * 📖 [paiza.io](https://paiza.io/ja/projects/new?language=javascript)
+//
 //
 // シナリオ
+// =======
 //
 // - HTMLタグ入りの文字列が、ストリームで数文字ずつ分割して送られてくる
 // - 送られてきた順に、本文およびタグを読取る
 //
 //
-// Examples
-// ========
+// 入力データの例
+// ============
 //
-// 入力（以下のような、細切れの文字列）
-// ------------------------------
+// * 以下のように、入力文字列をランダムな長さに細切れにしてから入力される
 //
 // <,font color="yell,ow" ,size=",18,">ローナ,</,fo,n,t>：<br>
 // あ,りがとうござ,いま,す！ぜひ食べて,み,てく,ださ,い。<br,>
@@ -167,8 +176,8 @@ function main() {
     testDataFragments.push(tempBuffer.join(""));
     tempBuffer = [];
     console.log(`
-フラグメンツ
-==========
+入力データ例
+============
 ${testDataFragments}
 `);
 
@@ -184,9 +193,9 @@ ${testDataFragments}
         //
         (fragment) => {
             //
-            // 出力例： Body(あ)
+            // 出力例： Body     | あ
             //
-            console.log(`Body(${fragment})`);
+            console.log(`Body     | ${fragment}`);
         },
         //
         // タグを読み取った時の処理をここに書く
@@ -204,9 +213,9 @@ ${testDataFragments}
                 // 閉じタグを読取った時の処理をここに書く
                 // =================================
                 //
-                // 出力例： CloseTag(</Font>) Name(Font)
+                // 出力例： CloseTag | font | </font>
                 //
-                console.log(`CloseTag(${sourceText}) Name(${tagName})`);
+                console.log(`CloseTag | ${tagName} | ${sourceText}`);
             } else {
                 // 開きタグ、または単独で使うタグを読取った時の処理をここに書く
                 // ===================================================
@@ -214,28 +223,27 @@ ${testDataFragments}
                 // 属性の読取り方の例
                 // ================
                 //
-                // 出力例： Tag(<font color="yellow" size="24">) Name(font) Attributes( (color=yellow)  (size=24) )
+                // 出力例： Tag      | font {color=yellow, size=24} | <font color="yellow" size="24">
                 //
                 const buffer = [];
                 for (const key in attributes) {
-                    buffer.push(" (");
-                    buffer.push(key);
-                    buffer.push("=");
-                    buffer.push(attributes[key]);
-                    buffer.push(") ");
+                    buffer.push(`${key}=${attributes[key]}`);
                 }
-                const attributesStr = buffer.join("");
-                console.log(`Tag(${sourceText}) Name(${tagName}) Attributes(${attributesStr})`);
+                let attributesStr = "";
+                if (1 <= buffer.length) {
+                    attributesStr = "{" + buffer.join(", ") + "} ";
+                }
+                console.log(`Tag      | ${tagName} ${attributesStr}| ${sourceText}`);
             }
         }
     );
 
-    // 読取実験開始
-    // ==========
+    // 読取開始
+    // ========
     //
     console.log(`
-読取実験開始
-==========
+読取例
+======
 `);
     for (const fragment of testDataFragments) {
         streamHtmlParser.append(fragment);
@@ -361,7 +369,6 @@ class StreamHTMLParser {
                     // 値が確定すると、１つ前の属性の名前とペアになる
                     if (previousAttributeName !== "") {
                         let previousAttributeValue = text.slice(0, nameStart).trim();
-                        console.log(`previousAttributeName:(${previousAttributeName}) nameStart:(${nameStart}) previousAttributeValue:(${previousAttributeValue})`);
 
                         // 値の両端にダブルクォーテーションがあれば外す
                         if (previousAttributeValue[0] === '"' && previousAttributeValue[previousAttributeValue.length - 1] === '"') {
