@@ -9,7 +9,11 @@
 ## Examples
 
 * [stream.js](./examples/stream.js) - ストリーム・パーサーの例（プログラムの理解用）
-* [html_stream_parser_o1o0.js](./examples/html_stream_parser_o1o0.js) - HTMLストリーム・パーサーの例（簡易的に実用的なもの）
+
+👇 別リポジトリへ移動した  
+
+* 📖 [html-stream-parser-for-java-script](https://github.com/muzudho/html-stream-parser-for-java-script) - HTMLストリーム・パーサーの例（簡易的に実用的なもの）
+
 ## References
 
 HTMLの仕様の例  
