@@ -5,7 +5,7 @@
 // 実行方法
 // =======
 //
-// 👇 Paiza の Webサイトで Java Script を貼り付けると、試行できる
+// 👇 このファイルを、 Paiza の Webサイトで Java Script を貼り付けると、試行できる
 //
 // * 📖 [paiza.io](https://paiza.io/ja/projects/new?language=javascript)
 //
@@ -17,146 +17,128 @@
 // - 送られてきた順に、本文およびタグを読取る
 //
 //
-// 入力データの例
+// 入力データ例
 // ============
 //
-// * 以下のように、入力文字列をランダムな長さに細切れにしてから入力される
+// - 以下のように、入力文字列をランダムな長さに細切れにしてから入力される
 //
-// <,font color="yell,ow" ,size=",18,">ローナ,</,fo,n,t>：<br>
-// あ,りがとうござ,いま,す！ぜひ食べて,み,てく,ださ,い。<br,>
-// ご注文いただ,けますか？
+// <,fo,nt c,olor="yellow" ,si,ze="1,8">上長</,font>：,<br,>
+// ちょっと,　これだけ入れ,てく,ださい　,これ,だけ,。<br,>,
+// 簡,単,だから
 //
-// <font color=,"yellow" size="24">エ,レノ,ア,<,/font>：,<br>
-// こんにちわ,、旅人,さん,！,あた,し,は<stro,ng>,エレノア<,/st,rong>,って言うんだ,よ。,
-// ここ,は<,str,ong,>,カ,ーレル,村</st,r,o,ng,>だ,よ。
-// ,
+// <font co,l,or,=",b,lue" siz,e="24">デベロ,ッパー</,font>,：<br,>
+// ,<,s,tr,ong>納期</,s,tron,g>は伸び,るんですか？,
+//
+// <,f,ont colo,r="yello,w" size="1,8">,上長</font>,：,<br>
+// 伸び,ない
 //
 //
-// コンソール出力の一例（タグを固まりとして取得できる）
-// --------------------------------------------
 //
-// Body(
-// )
-// previousAttributeName:(color) nameStart:(9) previousAttributeValue:("yellow")
-// Tag(<font color="yellow" size="18">) Name(font) Attributes( (color=yellow)  (size=18) )
-// Body(ロ)
-// Body(ー)
-// Body(ナ)
-// CloseTag(</font>) Name(font)
-// Body(：)
-// Tag(<br>) Name(br) Attributes()
-// Body(
-// )
-// Body(あ)
-// Body(り)
-// Body(が)
-// Body(と)
-// Body(う)
-// Body(ご)
-// Body(ざ)
-// Body(い)
-// Body(ま)
-// Body(す)
-// Body(！)
-// Body(ぜ)
-// Body(ひ)
-// Body(食)
-// Body(べ)
-// Body(て)
-// Body(み)
-// Body(て)
-// Body(く)
-// Body(だ)
-// Body(さ)
-// Body(い)
-// Body(。)
-// Tag(<br>) Name(br) Attributes()
-// Body(
-// )
-// Body(ご)
-// Body(注)
-// Body(文)
-// Body(い)
-// Body(た)
-// Body(だ)
-// Body(け)
-// Body(ま)
-// Body(す)
-// Body(か)
-// Body(？)
-// Body(
-// )
-// Body(
-// )
-// previousAttributeName:(color) nameStart:(9) previousAttributeValue:("yellow")
-// Tag(<font color="yellow" size="24">) Name(font) Attributes( (color=yellow)  (size=24) )
-// Body(エ)
-// Body(レ)
-// Body(ノ)
-// Body(ア)
-// CloseTag(</font>) Name(font)
-// Body(：)
-// Tag(<br>) Name(br) Attributes()
-// Body(
-// )
-// Body(こ)
-// Body(ん)
-// Body(に)
-// Body(ち)
-// Body(わ)
-// Body(、)
-// Body(旅)
-// Body(人)
-// Body(さ)
-// Body(ん)
-// Body(！)
-// Body(あ)
-// Body(た)
-// Body(し)
-// Body(は)
-// Tag(<strong>) Name(strong) Attributes()
-// Body(エ)
-// Body(レ)
-// Body(ノ)
-// Body(ア)
-// CloseTag(</strong>) Name(strong)
-// Body(っ)
-// Body(て)
-// Body(言)
-// Body(う)
-// Body(ん)
-// Body(だ)
-// Body(よ)
-// Body(。)
-// Body(
-// )
-// Body(こ)
-// Body(こ)
-// Body(は)
-// Tag(<strong>) Name(strong) Attributes()
-// Body(カ)
-// Body(ー)
-// Body(レ)
-// Body(ル)
-// Body(村)
-// CloseTag(</strong>) Name(strong)
-// Body(だ)
-// Body(よ)
-// Body(。)
-// Body(
-// )
+// 読取例
+// ======
+//
+// - 以下のように、タグを固まりとして取得できる
+//
+// Body     |
+//
+// Tag      | font {color=yellow, size=18} | <font color="yellow" size="18">
+// Body     | 上
+// Body     | 長
+// CloseTag | font | </font>
+// Body     | ：
+// Tag      | br | <br>
+// Body     |
+//
+// Body     | ち
+// Body     | ょ
+// Body     | っ
+// Body     | と
+// Body     |
+// Body     | こ
+// Body     | れ
+// Body     | だ
+// Body     | け
+// Body     | 入
+// Body     | れ
+// Body     | て
+// Body     | く
+// Body     | だ
+// Body     | さ
+// Body     | い
+// Body     |
+// Body     | こ
+// Body     | れ
+// Body     | だ
+// Body     | け
+// Body     | 。
+// Tag      | br | <br>
+// Body     |
+//
+// Body     | 簡
+// Body     | 単
+// Body     | だ
+// Body     | か
+// Body     | ら
+// Body     |
+//
+// Body     |
+//
+// Tag      | font {color=blue, size=24} | <font color="blue" size="24">
+// Body     | デ
+// Body     | ベ
+// Body     | ロ
+// Body     | ッ
+// Body     | パ
+// Body     | ー
+// CloseTag | font | </font>
+// Body     | ：
+// Tag      | br | <br>
+// Body     |
+//
+// Tag      | strong | <strong>
+// Body     | 納
+// Body     | 期
+// CloseTag | strong | </strong>
+// Body     | は
+// Body     | 伸
+// Body     | び
+// Body     | る
+// Body     | ん
+// Body     | で
+// Body     | す
+// Body     | か
+// Body     | ？
+// Body     |
+//
+// Body     |
+//
+// Tag      | font {color=yellow, size=18} | <font color="yellow" size="18">
+// Body     | 上
+// Body     | 長
+// CloseTag | font | </font>
+// Body     | ：
+// Tag      | br | <br>
+// Body     |
+//
+// Body     | 伸
+// Body     | び
+// Body     | な
+// Body     | い
+// Body     |
 
 function main() {
     // テスト・データ
     // ============
     const testData = `
-<font color="yellow" size="18">ローナ</font>：<br>
-ありがとうございます！ぜひ食べてみてください。<br>
-ご注文いただけますか？
+<font color="yellow" size="18">上長</font>：<br>
+ちょっと　これだけ入れてください　これだけ。<br>
+簡単だから
 
-<font color="yellow" size="24">エレノア</font>：<br>
-こんにちわ、旅人さん！あたしは<strong>エレノア</strong>って言うんだよ。
-ここは<strong>カーレル村</strong>だよ。
+<font color="blue" size="24">デベロッパー</font>：<br>
+<strong>納期</strong>は伸びるんですか？
+
+<font color="yellow" size="18">上長</font>：<br>
+伸びない
 `;
 
     // フラグメンテーション
@@ -178,6 +160,9 @@ function main() {
     console.log(`
 入力データ例
 ============
+
+- 以下のように、入力文字列をランダムな長さに細切れにしてから入力される
+
 ${testDataFragments}
 `);
 
@@ -244,6 +229,9 @@ ${testDataFragments}
     console.log(`
 読取例
 ======
+
+- 以下のように、タグを固まりとして取得できる
+
 `);
     for (const fragment of testDataFragments) {
         streamHtmlParser.append(fragment);
